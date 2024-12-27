@@ -1,20 +1,18 @@
-Voici une suggestion pour un fichier README décrivant ton projet **youtube-downloader-api** :  
 
----
 
 # YouTube Downloader API  
 
 ## Description  
-**YouTube Downloader API** est une API RESTful construite avec **Django** et **Django REST Framework (DRF)**, permettant de télécharger des vidéos YouTube et de générer une URL unique pour chaque vidéo téléchargée.  
+**YouTube Downloader API** is a RESTful API built with **Django** and **Django REST Framework (DRF)** that allows downloading YouTube videos and generating a unique URL for each downloaded video.  
 
-### Fonctionnalités :  
-- Télécharger des vidéos YouTube en spécifiant une URL.  
-- Renvoyer une URL pour accéder à la vidéo téléchargée.  
-- Génération automatique de noms uniques pour les vidéos avec le format `uuid4_nom_video.mp4`.  
+### Features:  
+- Download YouTube videos by providing a URL.  
+- Return a URL to access the downloaded video.  
+- Automatically generate unique names for videos in the format `uuid4_video_name.mp4`.  
 
 ---
 
-## Technologies utilisées  
+## Technologies Used  
 - **Python 3.10+**  
 - **Django 4.x**  
 - **Django REST Framework**  
@@ -23,66 +21,66 @@ Voici une suggestion pour un fichier README décrivant ton projet **youtube-down
 
 ## Installation  
 
-1. **Cloner le dépôt** :  
+1. **Clone the repository**:  
    ```bash
-   git clone https://github.com/ton-repo/youtube-downloader-api.git
+   git clone https://github.com/your-repo/youtube-downloader-api.git
    cd youtube-downloader-api
    ```
 
-2. **Créer et activer un environnement virtuel** :  
+2. **Create and activate a virtual environment**:  
    ```bash
    python -m venv env
-   source env/bin/activate  # Sur Windows : env\Scripts\activate
+   source env/bin/activate  # On Windows: env\Scripts\activate
    ```
 
-3. **Installer les dépendances** :  
+3. **Install the dependencies**:  
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Appliquer les migrations** :  
+4. **Apply the migrations**:  
    ```bash
    python manage.py migrate
    ```
 
-5. **Lancer le serveur de développement** :  
+5. **Start the development server**:  
    ```bash
    python manage.py runserver
    ```
 
 ---
 
-## Points d'entrée API  
+## API Endpoints  
 
-### 1. **Téléchargement de vidéo**  
+### 1. **Video Download**  
 **POST** `/api/download/`  
 
-- **Payload** :  
+- **Payload**:  
   ```json
   {
     "url": "https://www.youtube.com/watch?v=example"
   }
   ```  
 
-- **Réponse** :  
+- **Response**:  
   ```json
   {
-    "message": "Téléchargement réussi.",
-    "media_url": "http://127.0.0.1:8000/media/videos/4429f76ca0114078a69f9511dfd76e2b_ma_video.mp4"
+    "message": "Download successful.",
+    "media_url": "http://127.0.0.1:8000/media/videos/4429f76ca0114078a69f9511dfd76e2b_video_name.mp4"
   }
   ```  
 
 ---
 
-## Exemple de configuration pour déploiement  
-Le projet peut être déployé sur des plateformes comme **Docker**, **Nginx**, ou des services cloud tels que **Google Cloud Platform** ou **AWS**.  
+## Deployment Example  
+The project can be deployed on platforms like **Docker**, **Nginx**, or cloud services such as **Google Cloud Platform** or **AWS**.  
 
 ---
 
-## Contribuer  
-Les contributions sont les bienvenues ! Si vous souhaitez apporter des améliorations, merci de créer une branche ou de soumettre une pull request.  
+## Contribute  
+Contributions are welcome! If you would like to make improvements, feel free to create a branch or submit a pull request.  
 
---- 
+---  
 
-## Auteur  
-Bono Mbelle Aurélien - Développeur full stack et passionné d'IA.  
+## Author  
+Bono Mbelle Aurélien - Full-stack developer and AI enthusiast.  
