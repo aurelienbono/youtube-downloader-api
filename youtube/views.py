@@ -1,7 +1,8 @@
 import os
 from rest_framework.decorators import api_view 
 from rest_framework.response import Response 
-from .utils import YoutubeDownloaderManager
+from .utils import * 
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import status 
 from django.conf import settings
@@ -33,8 +34,15 @@ def download_mp4_video_to_link(request):
     
     if video_url:
         try:
-            manager = YoutubeDownloaderManager()
-            file_name = manager.download_mp4_video_to_link(video_url)
+            if "drive.google.com" in video_url and "/file/d/" in video_url: 
+                
+                manager = GoogleDriverDownloaderManager()
+                file_name = manager.download_google_drive_file(video_url)
+                
+                pass 
+            else : 
+                manager = YoutubeDownloaderManager()
+                file_name = manager.download_mp4_video_to_link(video_url)
             
             media_url = f"{settings.MEDIA_URL}videos/{file_name}"
             media_url = request.build_absolute_uri(media_url)
@@ -53,7 +61,6 @@ def download_mp4_video_to_link(request):
             {"error": "Le paramètre 'video_url' est requis."},
             status=status.HTTP_400_BAD_REQUEST
         )
-
 
 
 
