@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: downloader_video_manager_on_web
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8001"
+    
+
+
