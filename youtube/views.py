@@ -2,7 +2,7 @@ import os
 from rest_framework.decorators import api_view 
 from rest_framework.response import Response 
 from .utils import * 
-
+import re
 from drf_spectacular.utils import extend_schema
 from rest_framework import status 
 from django.conf import settings
@@ -10,11 +10,11 @@ from django.conf import settings
 
 
 @extend_schema(
-    tags=['Youtube Download'], 
+    tags=['Video Download'], 
     request={
         'application/json': {
             'properties': {
-                'video_url': {'type': 'string', 'example': 'https://www.youtube.com/watch?v=tXjKPJ5KJUY'},
+                'video_url': {'type': 'string', 'example': 'https://www.facebook.com/somevideo'},
             }
         }
     },
@@ -22,7 +22,7 @@ from django.conf import settings
         200: {
             'properties': {
                 'message': {'type': 'string', 'example': 'Téléchargement réussi.'},
-                'media_url': {'type': 'string', 'example': 'http://localhost:8000/media/videos/video_name.mp4'},
+                'media_url': {'type': 'string', 'example': 'http://url_of_Server:8000/media/facebook_videos/video_name.mp4'},
             }
         },
         400: {'properties': {'error': {'type': 'string', 'example': 'Le paramètre "video_url" est requis.'}}}
@@ -34,13 +34,19 @@ def download_mp4_video_to_link(request):
     
     if video_url:
         try:
-            if "drive.google.com" in video_url and "/file/d/" in video_url: 
-                
+            fb_patterns = [
+                r'https?://(?:www\.)?facebook\.com/.+/videos/\d+',   
+                r'https?://fb\.watch/.+' 
+                r'https?://(?:www\.)?facebook\.com/.+/videos/.+', 
+            ]
+            
+            if any(re.match(pattern, video_url) for pattern in fb_patterns):
+                manager = FacebookManagerDownloader()
+                file_name = manager.download_video_to_link(video_url)
+            elif "drive.google.com" in video_url and "/file/d/" in video_url:
                 manager = GoogleDriverDownloaderManager()
                 file_name = manager.download_google_drive_file(video_url)
-                
-                pass 
-            else : 
+            else:
                 manager = YoutubeDownloaderManager()
                 file_name = manager.download_mp4_video_to_link(video_url)
             
@@ -61,6 +67,3 @@ def download_mp4_video_to_link(request):
             {"error": "Le paramètre 'video_url' est requis."},
             status=status.HTTP_400_BAD_REQUEST
         )
-
-
-
