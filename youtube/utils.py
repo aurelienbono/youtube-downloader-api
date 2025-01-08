@@ -17,7 +17,8 @@ class YoutubeDownloaderManager:
             'format': 'mp4',
             'outtmpl': custom_path, 
             'restrictfilenames': True,   
-            'noplaylist': True,  
+            'noplaylist': True, 
+            'cookiefile': os.path.join(os.path.dirname(__file__), '../cookies.txt'),           
         }
 
         try:
