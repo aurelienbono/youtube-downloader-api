@@ -34,21 +34,26 @@ def download_mp4_video_to_link(request):
     
     if video_url:
         try:
-            fb_patterns = [
-                r'https?://(?:www\.)?facebook\.com/.+/videos/\d+',   
-                r'https?://fb\.watch/.+' 
-                r'https?://(?:www\.)?facebook\.com/.+/videos/.+', 
+            youtube_patterns = [
+                r'https?://(?:www\.)?(youtube\.com|youtu\.be)/.+',
             ]
+            print("passs")
             
-            if any(re.match(pattern, video_url) for pattern in fb_patterns):
-                manager = FacebookManagerDownloader()
-                file_name = manager.download_video_to_link(video_url)
-            elif "drive.google.com" in video_url and "/file/d/" in video_url:
-                manager = GoogleDriverDownloaderManager()
-                file_name = manager.download_google_drive_file(video_url)
-            else:
+            
+            if any(re.match(pattern, video_url) for pattern in youtube_patterns):
+                print("passs you")
                 manager = YoutubeDownloaderManager()
                 file_name = manager.download_mp4_video_to_link(video_url)
+            
+            elif "drive.google.com" in video_url and "/file/d/" in video_url:
+                print("passs driver")
+                manager = GoogleDriverDownloaderManager()
+                file_name = manager.download_google_drive_file(video_url)
+            
+            else:
+                print("passs fb")
+                manager = FacebookManagerDownloader()
+                file_name = manager.download_video_to_link(video_url)
             
             media_url = f"{settings.MEDIA_URL}videos/{file_name}"
             media_url = request.build_absolute_uri(media_url)
@@ -67,3 +72,4 @@ def download_mp4_video_to_link(request):
             {"error": "Le paramètre 'video_url' est requis."},
             status=status.HTTP_400_BAD_REQUEST
         )
+
