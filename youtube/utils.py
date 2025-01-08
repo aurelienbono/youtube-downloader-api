@@ -3,8 +3,6 @@ import os
 from django.conf import settings
 from uuid import uuid4
 import gdown
-import subprocess
-
 
 class YoutubeDownloaderManager:
     def __init__(self):
@@ -61,7 +59,8 @@ class GoogleDriverDownloaderManager:
 
         return custom_name
     
-    
+ 
+from yt_dlp import YoutubeDL
 
 class FacebookManagerDownloader:
     def __init__(self):
@@ -69,25 +68,36 @@ class FacebookManagerDownloader:
         os.makedirs(self.download_path, exist_ok=True)
 
     def download_facebook_video(self, video_url):
+        # Générer un nom unique pour la vidéo
         custom_name = f"{str(uuid4()).replace('-', '')}_ma_video.mp4"
         custom_path = os.path.join(self.download_path, custom_name)
 
-        command = [
-            "yt-dlp",
-            "--format", "bestvideo",
-            "--output", custom_path,
-            "--restrict-filenames",
-            "--noplaylist",
-            "--cookiefile", os.path.join(os.path.dirname(__file__), '../cookies_fb.txt'),
-            "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            video_url.strip()
-        ]
+        # Options de téléchargement pour yt-dlp
+        ydl_opts = {
+            'format': 'bestvideo',
+            'outtmpl': custom_path,
+            'restrictfilenames': True,
+            'noplaylist': True,
+            'cookiefile': os.path.join(os.path.dirname(__file__), '../cookies_fb.txt'),
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
+            # Gestion personnalisée des erreurs et des redirections
+            'max_downloads': 1,  # Évite les téléchargements multiples
+            'retry': {
+                'http_errors': 10,  # Réessayer jusqu'à 10 redirections
+                'fragment': 5,  # Réessayer jusqu'à 5 fois pour un fragment
+            },
+            'geo_bypass': True,  # Contourner les restrictions géographiques
+        }
+
         try:
-            subprocess.run(command, check=True)
-            return custom_name  
-        except subprocess.CalledProcessError as e:
+            with YoutubeDL(ydl_opts) as ydl:
+                ydl.download([video_url])
+            return custom_name  # Retourne le nom du fichier
+        except Exception as e:
             raise Exception(f"Erreur lors du téléchargement de la vidéo Facebook : {str(e)}")
 
     def download_video_to_link(self, video_url):
-        return self.download_facebook_video(video_url)
-
+        # Télécharge la vidéo et retourne le nom du fichier
+        return self.download_facebook_video(video_url.strip())
