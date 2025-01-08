@@ -3,6 +3,8 @@ import os
 from django.conf import settings
 from uuid import uuid4
 import gdown
+import subprocess
+
 
 class YoutubeDownloaderManager:
     def __init__(self):
@@ -60,7 +62,6 @@ class GoogleDriverDownloaderManager:
         return custom_name
     
     
-    
 
 class FacebookManagerDownloader:
     def __init__(self):
@@ -71,25 +72,22 @@ class FacebookManagerDownloader:
         custom_name = f"{str(uuid4()).replace('-', '')}_ma_video.mp4"
         custom_path = os.path.join(self.download_path, custom_name)
 
-        ydl_opts = {
-            'format': 'bestvideo', 
-            'outtmpl': custom_path, 
-            'restrictfilenames': True, 
-            'noplaylist': True,
-            'cookiefile': os.path.join(os.path.dirname(__file__), '../cookies_fb.txt'),
-            'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            },
-        }
-
+        command = [
+            "yt-dlp",
+            "--format", "bestvideo",
+            "--output", custom_path,
+            "--restrict-filenames",
+            "--noplaylist",
+            "--cookiefile", os.path.join(os.path.dirname(__file__), '../cookies_fb.txt'),
+            "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            video_url.strip()
+        ]
         try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([video_url])
+            subprocess.run(command, check=True)
             return custom_name  
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             raise Exception(f"Erreur lors du téléchargement de la vidéo Facebook : {str(e)}")
 
     def download_video_to_link(self, video_url):
-        # Télécharge la vidéo et retourne le nom du fichier
-        file_name = self.download_facebook_video(video_url.strip())
-        return file_name
+        return self.download_facebook_video(video_url)
+
