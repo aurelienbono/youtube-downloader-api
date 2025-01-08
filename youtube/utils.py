@@ -76,6 +76,7 @@ class FacebookManagerDownloader:
             'outtmpl': custom_path, 
             'restrictfilenames': True, 
             'noplaylist': True,
+            'cookiefile': os.path.join(os.path.dirname(__file__), '../cookies_fb.txt'),
         }
 
         try:
