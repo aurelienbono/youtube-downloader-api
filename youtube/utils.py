@@ -92,3 +92,35 @@ class FacebookManagerDownloader:
     def download_video_to_link(self, video_url):
         file_name = self.download_facebook_video(video_url.strip())
         return file_name
+
+
+
+
+
+class TwitterDownloaderManager:
+    def __init__(self):
+        self.download_path = os.path.join(settings.MEDIA_ROOT, 'videos')
+        os.makedirs(self.download_path, exist_ok=True)
+
+    def download_twitter_video(self, video_url):
+        custom_name = f"{str(uuid4()).replace('-', '')}_ma_video.mp4"
+        custom_path = os.path.join(self.download_path, custom_name)
+
+        ydl_opts = {
+            'format': 'bestaudio+bestvideo/best',  
+            'outtmpl': custom_path, 
+            'restrictfilenames': True,   
+            'noplaylist': True, 
+            'merge_output_format': 'mp4',  
+        }
+
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.extract_info(video_url, download=True)
+            return custom_name  
+        except Exception as e:
+            raise Exception(f"Erreur lors du téléchargement de la vidéo Twitter : {str(e)}")
+
+    def download_video_to_link(self, video_url):
+        file_name = self.download_twitter_video(video_url.strip())
+        return file_name

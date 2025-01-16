@@ -9,12 +9,13 @@ from django.conf import settings
 
 
 
+
 @extend_schema(
     tags=['Video Download'], 
     request={
         'application/json': {
             'properties': {
-                'video_url': {'type': 'string', 'example': 'https://www.facebook.com/somevideo'},
+                'video_url': {'type': 'string', 'example': 'https://twitter.com/somevideo'},
             }
         }
     },
@@ -22,7 +23,7 @@ from django.conf import settings
         200: {
             'properties': {
                 'message': {'type': 'string', 'example': 'Téléchargement réussi.'},
-                'media_url': {'type': 'string', 'example': 'http://url_of_Server:8000/media/facebook_videos/video_name.mp4'},
+                'media_url': {'type': 'string', 'example': 'http://url_of_Server:8000/media/videos/video_name.mp4'},
             }
         },
         400: {'properties': {'error': {'type': 'string', 'example': 'Le paramètre "video_url" est requis.'}}}
@@ -37,21 +38,24 @@ def download_mp4_video_to_link(request):
             youtube_patterns = [
                 r'https?://(?:www\.)?(youtube\.com|youtu\.be)/.+',
             ]
-            print("passs")
             
-            
+            twitter_patterns = [
+            r'https?://(?:www\.)?(twitter\.com|x\.com)/.+/status/\d+',
+            ]
+
             if any(re.match(pattern, video_url) for pattern in youtube_patterns):
-                print("passs you")
                 manager = YoutubeDownloaderManager()
                 file_name = manager.download_mp4_video_to_link(video_url)
             
             elif "drive.google.com" in video_url and "/file/d/" in video_url:
-                print("passs driver")
                 manager = GoogleDriverDownloaderManager()
                 file_name = manager.download_google_drive_file(video_url)
             
+            elif any(re.match(pattern, video_url) for pattern in twitter_patterns):
+                manager = TwitterDownloaderManager()
+                file_name = manager.download_video_to_link(video_url)
+            
             else:
-                print("passs fb")
                 manager = FacebookManagerDownloader()
                 file_name = manager.download_video_to_link(video_url)
             
