@@ -3,6 +3,8 @@ import os
 from django.conf import settings
 from uuid import uuid4
 import gdown
+import http.client
+import json
 
 class YoutubeDownloaderManager:
     def __init__(self):
@@ -67,6 +69,26 @@ class FacebookManagerDownloader:
         self.download_path = os.path.join(settings.MEDIA_ROOT, 'videos')
         os.makedirs(self.download_path, exist_ok=True)
 
+    def get_normal_url(self, short_url):
+        conn = http.client.HTTPSConnection("facebook17.p.rapidapi.com")
+        payload = json.dumps({"url": short_url})
+        headers = {
+            'x-rapidapi-key': "8606f4896cmshdd25e49e0d479afp19b97bjsnb15deeddeb75",
+            'x-rapidapi-host': "facebook17.p.rapidapi.com",
+            'Content-Type': "application/json"
+        }
+
+        conn.request("POST", "/api/facebook/links", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        data = json.loads(data)
+
+        # Extraire le sourceUrl
+        source_url = data[0]['meta']['sourceUrl']
+        return source_url
+    
+    
+
     def download_facebook_video(self, video_url):
         custom_name = f"{str(uuid4()).replace('-', '')}_ma_video.mp4"
         custom_path = os.path.join(self.download_path, custom_name)
@@ -89,10 +111,13 @@ class FacebookManagerDownloader:
         except Exception as e:
             raise Exception(f"Erreur lors du téléchargement de la vidéo Facebook : {str(e)}")
 
+
     def download_video_to_link(self, video_url):
+        if "fb.watch" in video_url:
+            video_url = self.get_normal_url(video_url)
+
         file_name = self.download_facebook_video(video_url.strip())
         return file_name
-
 
 
 
