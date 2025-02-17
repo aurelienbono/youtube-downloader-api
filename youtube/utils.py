@@ -94,7 +94,7 @@ class FacebookManagerDownloader:
         custom_path = os.path.join(self.download_path, custom_name)
 
         ydl_opts = {
-            'format': 'bestvideo', 
+            'format': 'best', 
             'outtmpl': custom_path, 
             'restrictfilenames': True, 
             'noplaylist': True,
