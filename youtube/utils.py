@@ -6,36 +6,7 @@ import gdown
 import http.client
 import json
 
-class YoutubeDownloaderManager:
-    def __init__(self):
-        self.download_path = os.path.join(settings.MEDIA_ROOT, 'videos')
-        os.makedirs(self.download_path, exist_ok=True)
-
-    def download_video(self, video_url):
-        custom_name = f"{str(uuid4()).replace('-', '')}_ma_video.mp4"
-        custom_path = os.path.join(self.download_path, custom_name)
-
-        ydl_opts = {
-            'format': 'mp4',
-            'outtmpl': custom_path, 
-            'restrictfilenames': True,   
-            'noplaylist': True, 
-            'cookiefile': os.path.join(os.path.dirname(__file__), '../cookies.txt'),           
-        }
-
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.extract_info(video_url, download=True)
-            return custom_name  
-        except Exception as e:
-            raise Exception(f"Erreur lors du téléchargement : {str(e)}")
-
-    def download_mp4_video_to_link(self, video_url):
-        file_name = self.download_video(video_url.strip())
-        return file_name
-
-
-
+ 
 
 class GoogleDriverDownloaderManager:
     def __init__(self):

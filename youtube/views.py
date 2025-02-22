@@ -1,10 +1,14 @@
 import os
 from rest_framework.decorators import api_view 
-from rest_framework.response import Response 
+from rest_framework.response import Response
+
+from youtube.youtube import youtube_downloader_full_manager 
 from .utils import * 
 import re
 from drf_spectacular.utils import extend_schema
 from rest_framework import status 
+from django.conf import settings
+import segno
 from django.conf import settings
 
 
@@ -44,8 +48,8 @@ def download_mp4_video_to_link(request):
             ]
 
             if any(re.match(pattern, video_url) for pattern in youtube_patterns):
-                manager = YoutubeDownloaderManager()
-                file_name = manager.download_mp4_video_to_link(video_url)
+                downloaded_videos = youtube_downloader_full_manager(video_url)
+                file_name = downloaded_videos
             
             elif "drive.google.com" in video_url and "/file/d/" in video_url:
                 manager = GoogleDriverDownloaderManager()
@@ -76,4 +80,5 @@ def download_mp4_video_to_link(request):
             {"error": "Le paramètre 'video_url' est requis."},
             status=status.HTTP_400_BAD_REQUEST
         )
+
 
