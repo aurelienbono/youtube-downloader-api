@@ -16,7 +16,7 @@ chrome_options.add_argument("--disable-infobars")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox") 
 chrome_options.add_argument("--disable-dev-shm-usage") 
-service = ChromeService("/usr/bin/chromedriver")  
+service = ChromeService("/usr/local/bin/chromedriver")  
 
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
