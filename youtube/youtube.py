@@ -11,14 +11,15 @@ import os
 from uuid import uuid4
 from django.conf import settings
 
-chrome_options = ChromeOptions()
+chrome_options = Options()
 chrome_options.add_argument("--disable-infobars")
-chrome_options.add_argument("--headless")
+chrome_options.add_argument("--headless")  
 chrome_options.add_argument("--no-sandbox") 
 chrome_options.add_argument("--disable-dev-shm-usage") 
-service = ChromeService("/usr/local/bin/chromedriver")  
 
-driver = webdriver.Chrome(service=service, options=chrome_options)
+# ✅ Laisser Selenium gérer l'installation de ChromeDriver
+driver = webdriver.Chrome(options=chrome_options)
+
 
 def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
     try:
