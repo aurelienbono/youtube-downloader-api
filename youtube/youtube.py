@@ -97,26 +97,8 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
             logging.info(f"📂 Dossier de téléchargement : {download_path}")
             
             for index, video_url in enumerate(download_urls):
-                headers = {**CUSTOM_HEADERS, "User-Agent": CUSTOM_HEADERS['User-Agent']}  # Ajout des headers personnalisés
-                
-                logging.info(f"⬇️ Téléchargement de la vidéo depuis {video_url}")
-                video_response = requests.get(video_url, headers=headers, stream=True)
-                
-                if video_response.status_code == 200:
-                    video_filename = f"video_{index + 1}_{uuid4()}.mp4"
-                    video_path = os.path.join(download_path, video_filename)
-                    
-                    with open(video_path, "wb") as f:
-                        for chunk in video_response.iter_content(chunk_size=1024):
-                            if chunk:
-                                f.write(chunk)
-                    
-                    downloaded_file_url = os.path.join(settings.MEDIA_URL, 'videos', video_filename)
-                    downloaded_files.append(downloaded_file_url)
-                    logging.info(f"✅ Vidéo téléchargée avec succès : {downloaded_file_url}")
-                else:
-                    logging.error(f"❌ Erreur HTTP {video_response.status_code} lors du téléchargement.")
-        
+                downloaded_files.append(video_url)
+       
         return downloaded_files
     
     except Exception as e:
