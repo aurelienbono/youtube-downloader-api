@@ -12,12 +12,13 @@ import re
 import os
 from uuid import uuid4
 from django.conf import settings
+from fake_useragent import UserAgent  # 📌 Importation du UserAgent
 
 # ✅ Configuration des logs
 logging.basicConfig(
-    level=logging.INFO,  # Niveau INFO pour voir les messages importants
+    level=logging.INFO,  
     format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler()]  # Redirige les logs vers stdout pour Docker
+    handlers=[logging.StreamHandler()]  
 )
 
 chrome_options = Options()
@@ -26,7 +27,6 @@ chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-# ✅ Utilisation de webdriver-manager pour gérer automatiquement ChromeDriver
 logging.info("🚀 Initialisation du WebDriver Chrome...")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 logging.info("✅ WebDriver Chrome initialisé avec succès.")
@@ -35,6 +35,7 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
     try:
         download_urls = []
         downloaded_files = []
+        ua = UserAgent().chrome  # 📌 Génération d'un User-Agent dynamique
 
         logging.info(f"🌐 Accès au site de téléchargement avec URL : {YOUTUBE_VIDEO_URL}")
         driver.get("https://ssyoutube.online/")
@@ -78,7 +79,8 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
 
             for index, video_url in enumerate(download_urls):
                 logging.info(f"⬇️ Téléchargement de la vidéo depuis {video_url}...")
-                video_response = requests.get(video_url, stream=True)
+                headers = {"User-Agent": ua}  # 📌 Ajout de l'User-Agent dans la requête
+                video_response = requests.get(video_url, headers=headers, stream=True)
 
                 if video_response.status_code == 200:
                     video_filename = f"video_{index + 1}_{uuid4()}.mp4"
