@@ -8,8 +8,6 @@ import re
 from drf_spectacular.utils import extend_schema
 from rest_framework import status 
 from django.conf import settings
-import segno
-from django.conf import settings
 
 
 
