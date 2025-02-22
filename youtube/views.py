@@ -42,12 +42,25 @@ def download_mp4_video_to_link(request):
             ]
             
             twitter_patterns = [
-            r'https?://(?:www\.)?(twitter\.com|x\.com)/.+/status/\d+',
+                r'https?://(?:www\.)?(twitter\.com|x\.com)/.+/status/\d+',
             ]
 
             if any(re.match(pattern, video_url) for pattern in youtube_patterns):
                 downloaded_videos = youtube_downloader_full_manager(video_url)
-                file_name = downloaded_videos
+                
+                # Retourner un dictionnaire avec toutes les URLs téléchargées
+                media_urls = [
+                    request.build_absolute_uri(f"{settings.MEDIA_URL}videos/{file}")
+                    for file in downloaded_videos
+                ]
+                
+                return Response(
+                    {
+                        "message": "Téléchargement réussi.",
+                        "media_urls": media_urls
+                    },
+                    status=status.HTTP_200_OK
+                )
             
             elif "drive.google.com" in video_url and "/file/d/" in video_url:
                 manager = GoogleDriverDownloaderManager()
@@ -61,8 +74,7 @@ def download_mp4_video_to_link(request):
                 manager = FacebookManagerDownloader()
                 file_name = manager.download_video_to_link(video_url)
             
-            media_url = f"{settings.MEDIA_URL}videos/{file_name}"
-            media_url = request.build_absolute_uri(media_url)
+            media_url = request.build_absolute_uri(f"{settings.MEDIA_URL}videos/{file_name}")
             
             return Response(
                 {"message": "Téléchargement réussi.", "media_url": media_url},
@@ -78,5 +90,3 @@ def download_mp4_video_to_link(request):
             {"error": "Le paramètre 'video_url' est requis."},
             status=status.HTTP_400_BAD_REQUEST
         )
-
-

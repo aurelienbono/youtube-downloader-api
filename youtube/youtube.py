@@ -1,8 +1,8 @@
 import time
 import requests
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
@@ -10,15 +10,13 @@ import re
 import os
 from uuid import uuid4
 from django.conf import settings
-from webdriver_manager.chrome import ChromeDriverManager
 
-chrome_options = Options()
+chrome_options = ChromeOptions()
 chrome_options.add_argument("--disable-infobars")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox") 
-chrome_options.add_argument("--disable-dev-shm-usage")
-
-service = Service(ChromeDriverManager().install())  # Utilisation de webdriver-manager
+chrome_options.add_argument("--disable-dev-shm-usage") 
+service = ChromeService("/usr/local/bin/chromedriver")  
 
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
@@ -49,7 +47,22 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
                         match = re.search(r"window\.location\.href='(.*?)'", button["onclick"])
                         if match:
                             download_urls.append(match.group(1))
+                            print(f"🎥 Lien de téléchargement trouvé : {match.group(1)}")
+                        else : 
+                            print("⚠️ Lien non trouvé dans l'attribut onclick.")
+                            
+                    else : 
+                        print("⚠️ Pas de bouton trouvé dans cette ligne.")
+                        
+            else : 
+                print("⚠️ Aucune ligne <tr class='mp4'> trouvée.")
 
+        else:
+            print("⚠️ Aucun tableau de téléchargement trouvé.")
+               
+               
+               
+                         
         if download_urls:
             download_path = os.path.join(settings.MEDIA_ROOT, 'videos')
             os.makedirs(download_path, exist_ok=True)
@@ -59,6 +72,7 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
 
                 if video_response.status_code == 200:
                     video_filename = f"video_{index + 1}_{uuid4()}.mp4"
+                    
                     video_path = os.path.join(download_path, video_filename)
 
                     with open(video_path, "wb") as f:
@@ -67,6 +81,9 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
                                 f.write(chunk)
 
                     downloaded_files.append(os.path.join(settings.MEDIA_URL, 'videos', video_filename))
+                    print(f"✅ Vidéo téléchargée avec succès")
+                else : 
+                    print(f"❌ Erreur lors du téléchargement, code HTTP : {video_response.status_code}")
 
         return downloaded_files
 
