@@ -12,17 +12,25 @@ import re
 import os
 from uuid import uuid4
 from django.conf import settings
-from fake_useragent import UserAgent
-import random  # 📌 Pour sélectionner un proxy aléatoire
+from fake_useragent import UserAgent  # 📌 Importation du UserAgent
 
 # ✅ Configuration des logs
 logging.basicConfig(
-    level=logging.INFO,  
+    level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler()]  
+    handlers=[logging.StreamHandler()]
 )
 
+# ✅ Génération dynamique d'un User-Agent
+ua = UserAgent()
+
+def get_random_user_agent():
+    """Retourne un User-Agent aléatoire."""
+    return ua.random
+
+# ✅ Configuration du WebDriver avec un User-Agent aléatoire
 chrome_options = Options()
+chrome_options.add_argument(f"user-agent={get_random_user_agent()}")  # 📌 User-Agent dynamique
 chrome_options.add_argument("--disable-infobars")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
@@ -32,35 +40,11 @@ logging.info("🚀 Initialisation du WebDriver Chrome...")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 logging.info("✅ WebDriver Chrome initialisé avec succès.")
 
-# 📌 Liste de proxys gratuits (tu peux la mettre à jour régulièrement)
-PROXY_LIST = [
-    "https://103.137.110.146:7777", 
-    "https://50.169.222.243:80",
-    "https://51.254.78.223:80", 
-    "https://4.149.210.210:3128",  
-    "https://143.42.66.91:80", 
-    "https://192.73.244.36:80", 
-    "https://47.56.110.204:8989", 
-    "https://50.217.226.41:80", 
-    "https://162.223.90.130:80", 
-    "https://87.248.129.26:80", 
-    "https://50.207.199.81:80", 
-    "https://190.103.177.131:80",
-    "https://103.133.26.11:8080"
-]
-
-def get_random_proxy():
-    """ Retourne un proxy aléatoire de la liste """
-    return random.choice(PROXY_LIST)
-
 def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
     try:
         download_urls = []
         downloaded_files = []
-        ua = UserAgent().chrome  # 📌 Génération d'un User-Agent dynamique
-        proxy = get_random_proxy()  # 📌 Sélection aléatoire d’un proxy
-        proxies = {"http": proxy, "https": proxy}  # 📌 Ajout du proxy
-
+        
         logging.info(f"🌐 Accès au site de téléchargement avec URL : {YOUTUBE_VIDEO_URL}")
         driver.get("https://ssyoutube.online/")
         time.sleep(3)
@@ -102,30 +86,27 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
             logging.info(f"📂 Dossier de téléchargement : {download_path}")
 
             for index, video_url in enumerate(download_urls):
-                logging.info(f"⬇️ Téléchargement de la vidéo depuis {video_url} en utilisant le proxy {proxy} ...")
-                headers = {"User-Agent": ua}  # 📌 Ajout de l'User-Agent
+                random_user_agent = get_random_user_agent()  # 📌 Génération d'un nouvel UA
+                headers = {"User-Agent": random_user_agent}  
 
-                try:
-                    video_response = requests.get(video_url, headers=headers, proxies=proxies, stream=True)
+                logging.info(f"⬇️ Téléchargement de la vidéo depuis {video_url} avec UA: {random_user_agent}")
 
-                    if video_response.status_code == 200:
-                        video_filename = f"video_{index + 1}_{uuid4()}.mp4"
-                        video_path = os.path.join(download_path, video_filename)
+                video_response = requests.get(video_url, headers=headers, stream=True)
 
-                        with open(video_path, "wb") as f:
-                            for chunk in video_response.iter_content(chunk_size=1024):
-                                if chunk:
-                                    f.write(chunk)
+                if video_response.status_code == 200:
+                    video_filename = f"video_{index + 1}_{uuid4()}.mp4"
+                    video_path = os.path.join(download_path, video_filename)
 
-                        downloaded_file_url = os.path.join(settings.MEDIA_URL, 'videos', video_filename)
-                        downloaded_files.append(downloaded_file_url)
-                        logging.info(f"✅ Vidéo téléchargée avec succès : {downloaded_file_url}")
-                    else:
-                        logging.error(f"❌ Erreur HTTP {video_response.status_code} lors du téléchargement.")
+                    with open(video_path, "wb") as f:
+                        for chunk in video_response.iter_content(chunk_size=1024):
+                            if chunk:
+                                f.write(chunk)
 
-                except requests.exceptions.RequestException as e:
-                    logging.error(f"❌ Échec du téléchargement via proxy {proxy}, erreur : {e}")
-                    continue  # 📌 Passe au prochain lien en cas d’échec
+                    downloaded_file_url = os.path.join(settings.MEDIA_URL, 'videos', video_filename)
+                    downloaded_files.append(downloaded_file_url)
+                    logging.info(f"✅ Vidéo téléchargée avec succès : {downloaded_file_url}")
+                else:
+                    logging.error(f"❌ Erreur HTTP {video_response.status_code} lors du téléchargement.")
 
         return downloaded_files
 
