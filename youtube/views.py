@@ -49,15 +49,12 @@ def download_mp4_video_to_link(request):
                 downloaded_videos = youtube_downloader_full_manager(video_url)
                 
                 # Retourner un dictionnaire avec toutes les URLs téléchargées
-                media_urls = [
-                    request.build_absolute_uri(f"{settings.MEDIA_URL}videos/{file}")
-                    for file in downloaded_videos
-                ]
+          
                 
                 return Response(
                     {
                         "message": "Téléchargement réussi.",
-                        "media_urls": media_urls
+                        "media_urls": downloaded_videos
                     },
                     status=status.HTTP_200_OK
                 )
