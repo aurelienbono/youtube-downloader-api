@@ -52,3 +52,4 @@ zipp==3.21.0
 selenium==4.29.0
 webdriver-manager
 fake-useragent
+django-cors-headers
