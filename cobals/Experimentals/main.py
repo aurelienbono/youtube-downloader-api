@@ -127,6 +127,10 @@ import os
 
 # Configuration des options pour undetected-chromedriver
 options = uc.ChromeOptions()
+options.add_argument("--headless=new")  # Active le mode headless
+options.add_argument("--disable-gpu")  # Désactive l'utilisation du GPU (recommandé pour headless)
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
 # options.headless = True  # Décommenter si vous souhaitez exécuter en mode headless
 
 # Configurer le répertoire de téléchargement dans le dossier courant
