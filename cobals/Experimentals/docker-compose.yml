@@ -1,15 +1,13 @@
-version: '3.9'
+version: '3.8'
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: selenium_agent_manager_on_web
+    build: .
+    container_name: youtube_downloader
     restart: always
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
-    ports:
-      - "8030:8030"
-    
-
+    environment:
+      - PYTHONUNBUFFERED=1
