@@ -26,20 +26,18 @@ RUN CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_R
     chmod +x /usr/local/bin/chromedriver && \
     rm chromedriver.zip
 
-# Installer pip et mettre à jour
-RUN pip install --upgrade pip
 
-# Copier les dépendances Python
+
+# Copier les dépendances PythonL
 COPY requirements.txt .
 
-# Installer les dépendances
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt 
 
 # Copier le code source
-COPY . .
+COPY . .d
 
-# Exposer le port si nécessaire
-EXPOSE 8000
+# Exposer le port
+EXPOSE 8030
 
 # Lancer l'application
-CMD ["python", "main.py"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8030"]
