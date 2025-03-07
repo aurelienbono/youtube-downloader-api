@@ -77,7 +77,7 @@ def youtube_downloader_full_manager(YOUTUBE_VIDEO_URL):
         
         if table:
             logging.info("✅ Tableau de téléchargement trouvé.")
-            mp4_rows = table.find_all("tr", class_="mp4")
+            mp4_rows = table.find_all("tr")
             if mp4_rows:
                 for row in mp4_rows:
                     button = row.find("button", onclick=True)
